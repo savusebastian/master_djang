@@ -65,7 +65,7 @@ def upload_view(request):
 
 			for i in range(v):
 				for j in range(v):
-					if mask[h, i, j, 0] <= 0.5:
+					if mask[h, i, j, 0] <= 0.4:
 						image[line * v + i, h % c * v + j, :] = 0
 
 		out_image = Image.fromarray(np.uint8(image[0 : r * v, 0 : c * v, :]), 'RGB')
