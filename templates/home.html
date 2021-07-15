@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Image segmentation with tensorflow{% endblock %}
+
+{% block content %}
+<div class="upload">
+	<form class="" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
+		{% csrf_token %}
+		<input class="select" type="file" name="photo" hidden v-on:change="checkInput" />
+		<button class="submit" type="submit" name="button" hidden>Submit</button>
+	</form>
+
+	<button class="btn-select" type="button" name="button">Select Image</button>
+	<button class="btn-submit" type="button" name="button" v-bind:disabled="changed == false">Upload</button>
+</div>
+
+<div class="text">
+	<p class="custom-text">No file chosen</p>
+	<p class="custom-size">Size</p>
+</div>
+
+<div class="image">
+	<img class="image-upload" src="" />
+</div>
+{% endblock %}

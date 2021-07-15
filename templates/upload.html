@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block page_title %}Before and after{% endblock %}
+
+{% block content %}
+<div class="content">
+	<div class="content-image">
+		<img src="../media/{{ filename }}" />
+		<img src="../media/processed_images/{{ filename_processed }}" />
+	</div>
+
+	<div class="content-text">
+		<p>Name: {{ filename }}</p>
+		<p>Duration: {{ time }} seconds</p>
+
+		<a class="btn-download" href="../media/processed_images/{{ filename_processed }}" download>Download</a>
+	</div>
+</div>
+{% endblock %}
