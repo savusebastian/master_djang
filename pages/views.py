@@ -84,7 +84,7 @@ def upload_view(request):
 		else:
 			fss.save(image_file.name, image_file)
 
-		with tf.device('/device:gpu:0'):
+		with tf.device('/GPU:0'):
 			start_time = time()
 			input_path = path_upload / image_name
 			image_name = image_name.split('.')[0] + '_processed.jpg'
