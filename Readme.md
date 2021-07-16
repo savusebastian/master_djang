@@ -19,6 +19,9 @@ Modelul hdf5 se afla in models/
 Comada de rulare (in folderul cu fisierul manage.py):
 python manage.py runserver
 
+Comada de rulare (cu port diferit):
+python manage.py runserver 8080
+
 
 Comenzi aditionale django:
 	- django-admin startproject locatie/nume_proiect
