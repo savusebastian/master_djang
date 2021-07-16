@@ -27,3 +27,9 @@ Comenzi aditionale django:
 
 nume_aplicatie adica un nume pentru aplicatie - blog, e-commerce ...
 La mine numele aplicatiei este pages (adica pagini din site)
+
+
+Restul proiectului (creare model, testare, imagini ...) se afla in:
+Documents/python_scripts/master_segmentation
+Mai specific:
+Documents/python_scripts/master_segmentation/big
