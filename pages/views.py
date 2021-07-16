@@ -11,6 +11,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 import matplotlib.pyplot as plt
 import numpy as np
+import numba as nb
 import tensorflow as tf
 
 from .models import *
@@ -20,7 +21,6 @@ base_path = Path(__file__).resolve().parent.parent
 # path_model = base_path / 'models/model_8_3.h5'
 path_model = base_path / 'models/efficientnet_512.hdf5'
 model = get_efficientnet_unet((512, 512, 3))
-# model.compile(optimizer=Adam(), loss='binary_crossentropy', metrics=['acc'])
 # model.summary()
 model.load_weights(path_model)
 
@@ -35,28 +35,21 @@ def upload_view(request):
 	path_processed = path_upload / 'processed_images'
 	path_processed.mkdir(parents=True, exist_ok=True)
 
-	def process_image(input_path, output_path):
-		image = np.array(Image.open(input_path))
-		# image_resized = np.array(Image.open('path/image.png').resize((256, 256)))
-		image_f32 = image.astype(dtype=np.float32)
-		image_normalized = image_f32 / 255.0
-
-		w, h, d = image.shape
-		v = 512
-		r = w // v
-		c = h // v
-
+	@nb.jit(nopython=True)
+	def conv_2_net(img_norm, v, r, c, d):
 		image_batch = np.zeros((r * c, v, v, d), dtype=np.float32)
 		index = 0
 
 		for i in range(r):
 			for j in range(c):
-				image_batch[index, :, :, :] = image_normalized[i * v : (i + 1) * v, j * v : (j + 1) * v, :]
+				image_batch[index, :, :, :] = img_norm[i * v : (i + 1) * v, j * v : (j + 1) * v, :]
 				index += 1
 
-		mask = model.predict(image_batch)
-		# mask_reshaped = mask.reshape((r * v, c * v))
+		return image_batch
 
+
+	@nb.jit(nopython=True)
+	def post_proc(image, mask, v, r, c):
 		line = -1
 
 		for h in range(mask.shape[0]):
@@ -68,7 +61,45 @@ def upload_view(request):
 					if mask[h, i, j, 0] <= 0.5:
 						image[line * v + i, h % c * v + j, :] = 0
 
-		out_image = Image.fromarray(np.uint8(image[0 : r * v, 0 : c * v, :]), 'RGB')
+		return image
+
+
+	def process_image(input_path, output_path):
+		image = np.array(Image.open(input_path))
+		# image_resized = np.array(Image.open('path/image.png').resize((256, 256)))
+		image_f32 = image.astype(dtype=np.float32)
+		image_normalized = image_f32 / 255.0
+
+		w, h, d = image.shape
+		v = 512
+		r = w // v
+		c = h // v
+
+		# image_batch = np.zeros((r * c, v, v, d), dtype=np.float32)
+		# index = 0
+		#
+		# for i in range(r):
+		# 	for j in range(c):
+		# 		image_batch[index, :, :, :] = image_normalized[i * v : (i + 1) * v, j * v : (j + 1) * v, :]
+		# 		index += 1
+		#
+		# mask = model.predict(image_batch)
+		# line = -1
+		#
+		# for h in range(mask.shape[0]):
+		# 	if h % r == 0: # [0, 8]
+		# 		line += 1
+		#
+		# 	for i in range(v):
+		# 		for j in range(v):
+		# 			if mask[h, i, j, 0] <= 0.5:
+		# 				image[line * v + i, h % c * v + j, :] = 0
+
+		image_batch = conv_2_net(image_normalized, v, r, c, d)
+		mask = model.predict(image_batch)
+		img_out = post_proc(image, mask, v, r, c)
+
+		out_image = Image.fromarray(np.uint8(img_out[0 : r * v, 0 : c * v, :]), 'RGB')
 		out_image.save(output_path)
 
 

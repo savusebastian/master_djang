@@ -5,7 +5,11 @@ $(document).ready(function(){
 
 	$('.btn-submit').on('click', function(){
 		$('.submit').click();
-		$('.main-menu, h1, .upload, .text, .image').hide();
+		// Keep one line or the other (below)
+		// Uncomment line 9 to hide the image
+		// $('.main-menu, h1, .upload, .text, .image').hide();
+		// Uncomment line 11 to show image
+		$('.main-menu, h1, .upload, .text').hide();
 		$('.page-loading').show();
 	});
 
