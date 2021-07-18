@@ -6,7 +6,7 @@
 <div class="upload">
 	<form class="" action="{% url 'upload' %}" method="post" enctype="multipart/form-data">
 		{% csrf_token %}
-		<input class="select" type="file" name="photo" hidden v-on:change="checkInput" />
+		<input class="select" type="file" name="photo" hidden v-on:change="checkInput">
 		<button class="submit" type="submit" name="button" hidden>Submit</button>
 	</form>
 
@@ -20,6 +20,6 @@
 </div>
 
 <div class="image">
-	<img class="image-upload" src="" />
+	<img class="image-upload" src="">
 </div>
 {% endblock %}
