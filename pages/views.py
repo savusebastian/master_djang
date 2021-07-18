@@ -96,7 +96,13 @@ def upload_view(request):
 		# 				image[line * v + i, h % c * v + j, :] = 0
 
 		image_batch = conv_2_net(image_normalized, v, r, c, d)
-		mask = model.predict(image_batch)
+		# mask = model.predict(image_batch)
+
+		mask = np.copy(image_batch)
+
+		for idx in range(mask.shape[0]):
+			mask[idx:idx + 1, :, :, :] = model.predict(image_batch[idx:idx + 1, :, :, :])
+
 		img_out = post_proc(image, mask, v, r, c)
 
 		out_image = Image.fromarray(np.uint8(img_out[0 : r * v, 0 : c * v, :]), 'RGB')
